@@ -9,6 +9,15 @@
 import UIKit
 import MapKit
 
+class PhotoAnnotation: NSObject, MKAnnotation {
+    var coordinate: CLLocationCoordinate2D = CLLocationCoordinate2DMake(0, 0)
+    var photo: UIImage!
+    
+    var title: String? {
+        return "\(coordinate.latitude)"
+    }
+}
+
 class PhotoMapViewController: UIViewController, LocationsViewControllerDelegate {
     @IBOutlet weak var cameraButton: UIButton!
     @IBOutlet weak var mapview: MKMapView!
@@ -18,6 +27,8 @@ class PhotoMapViewController: UIViewController, LocationsViewControllerDelegate 
     override func viewDidLoad() {
         super.viewDidLoad()
 
+        mapview.delegate = self
+        
         cameraButton.layer.cornerRadius = 50
         let sfRegion = MKCoordinateRegionMake(CLLocationCoordinate2DMake(37.783333, -122.416667), MKCoordinateSpanMake(0.1, 0.1))
         mapview.setRegion(sfRegion, animated: false)
@@ -55,7 +66,7 @@ class PhotoMapViewController: UIViewController, LocationsViewControllerDelegate 
         
         let annotation = MKPointAnnotation()
         annotation.coordinate = coordinates
-        annotation.title = "Pic!"
+        annotation.title = "(\(latitude), \(longitude))"
         mapview.addAnnotation(annotation)
     }
     
@@ -70,6 +81,7 @@ class PhotoMapViewController: UIViewController, LocationsViewControllerDelegate 
 
 }
 extension PhotoMapViewController: MKMapViewDelegate {
+    
     func mapView(_ mapView: MKMapView, viewFor annotation: MKAnnotation) -> MKAnnotationView? {
         let reuseID = "myAnnotationView"
         
@@ -80,11 +92,8 @@ extension PhotoMapViewController: MKMapViewDelegate {
             annotationView!.leftCalloutAccessoryView = UIImageView(frame: CGRect(x:0, y:0, width: 50, height:50))
         }
         
-        let imageView = annotationView?.leftCalloutAccessoryView as! UIImageView
-        if let userImage = self.userPhoto {
-            imageView.image = userImage
-            print("successfully set image")
-        }
+       let imageView = annotationView?.leftCalloutAccessoryView as! UIImageView
+        imageView.image = UIImage(named: "camera")
         
         return annotationView
     }
